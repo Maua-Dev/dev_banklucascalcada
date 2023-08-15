@@ -9,7 +9,7 @@ class BankAccount:
         self.__current_balance = current_balance
         self.__history = []
 
-    def Deposit(self,ammount:float) -> None:
+    def Deposit(self,ammount:float) -> dict:
         if (ammount >= self.__current_balance * 2):
             raise HTTPException(status_code=403, detail="Depósito suspeito")
 
@@ -18,7 +18,10 @@ class BankAccount:
         transactionObj = Transaction(TransactionType.DEPOSIT, ammount, self.__current_balance)
         self.__history.append(transactionObj.toDict())
 
-    def Withdraw(self,ammount:float) -> None:
+        response = {"current_balance": self.__current_balance, "timestamp": transactionObj.timestamp}
+        return response
+
+    def Withdraw(self,ammount:float) -> dict:
         if ammount > self.__current_balance:
             raise HTTPException(status_code=403, detail="Saldo insuficiente para transação")
 
@@ -26,6 +29,17 @@ class BankAccount:
 
         transactionObj = Transaction(TransactionType.WITHDRAW, ammount, self.__current_balance)
         self.__history.append(transactionObj.toDict())
+
+        response = {"current_balance": self.__current_balance, "timestamp": transactionObj.timestamp}
+        return response
+
+    def toDict(self) -> dict:
+        return {
+            "name": self.__name,
+            "agency": self.__agency,
+            "account": self.__account,
+            "current_balance": self.__current_balance
+        }
 
     @property
     def name(self) -> str:
@@ -46,5 +60,3 @@ class BankAccount:
     @property
     def history(self) -> dict:
         return {"all_transactions": self.__history}
-
-

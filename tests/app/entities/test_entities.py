@@ -1,6 +1,7 @@
 import pytest
 from src.app.entities.transaction import Transaction, TransactionType
 from src.app.entities.account import BankAccount
+from src.app.entities.bankNotesParser import NotesToMoney
 from fastapi.exceptions import HTTPException
 
 def test_transaction():
@@ -39,3 +40,14 @@ def test_account():
     with pytest.raises(HTTPException):
         account.Withdraw(1000.0)
 
+def test_note_parser():
+    notes = {
+        "2": 1,
+        "5": 2,
+        "10": 3,
+        "20": 4,
+        "50": 5 ,
+        "100": 6,
+        "200": 7
+    }
+    assert NotesToMoney(notes) == 2372

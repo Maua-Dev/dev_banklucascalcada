@@ -33,5 +33,9 @@ class Transaction:
     def currentBalance(self) -> float:
         return self.__currentBalance
     
+    @property
+    def timestamp(self) -> float:
+        return self.__timestamp
+
 if __name__ == "__main__":
     a = Transaction(TransactionType.DEPOSIT, 10.0, 10.0)
