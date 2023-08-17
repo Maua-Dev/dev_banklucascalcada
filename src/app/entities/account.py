@@ -18,7 +18,7 @@ class BankAccount:
         }
 
     def addToHistory(self, transaction:Transaction) -> None:
-        self.__history.append(transaction)
+        self.__history.append(transaction.toDict())
 
     @property
     def history(self) -> dict:
