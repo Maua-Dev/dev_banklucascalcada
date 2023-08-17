@@ -13,13 +13,13 @@ def Root():
 
 @app.post("/deposit")
 def Deposit(notes:dict):
-    ammount = NotesToMoney(notes["body"])
+    ammount = NotesToMoney(notes)
     res = bankAccount.Deposit(ammount)
     return res
 
 @app.post("/withdraw")
 def Withdraw(notes:dict):
-    ammount = NotesToMoney(notes["body"])
+    ammount = NotesToMoney(notes)
     res = bankAccount.Withdraw(ammount)
     return res
     
