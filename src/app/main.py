@@ -1,30 +1,32 @@
 from .entities.account import BankAccount
 from .entities.bankNotesParser import NotesToMoney
+from .repo.bank_repository_mock import IBankMock 
 from fastapi import FastAPI, HTTPException
 from mangum import Mangum
 
-bankAccount = BankAccount("Lucas","1234","12345-6",100.0)
+repo = IBankMock()
+repo.create_account("Lucas","1234","12345-6",100.0)
 
 app = FastAPI()
 
 @app.get("/")
 def Root():
-    return bankAccount.toDict()
+    return repo.get_account("1234","12345-6")
 
 @app.post("/deposit")
 def Deposit(notes:dict):
     ammount = NotesToMoney(notes)
-    res = bankAccount.Deposit(ammount)
+    res = repo.deposit("1234","12345-6",ammount)
     return res
 
 @app.post("/withdraw")
 def Withdraw(notes:dict):
     ammount = NotesToMoney(notes)
-    res = bankAccount.Withdraw(ammount)
+    res = repo.withdraw("1234","12345-6",ammount)
     return res
     
 @app.get("/history")
 def History():
-    return bankAccount.history
+    return repo.get_history("1234","12345-6")
 
 handler = Mangum(app, lifespan="off")
