@@ -12,14 +12,14 @@ def Root():
     return bankAccount.toDict()
 
 @app.post("/deposit")
-def Deposit(notes):
-    ammount = NotesToMoney(notes)
+def Deposit(notes:dict):
+    ammount = NotesToMoney(notes["body"])
     res = bankAccount.Deposit(ammount)
     return res
 
 @app.post("/withdraw")
-def Withdraw(notes):
-    ammount = NotesToMoney(notes)
+def Withdraw(notes:dict):
+    ammount = NotesToMoney(notes["body"])
     res = bankAccount.Withdraw(ammount)
     return res
     
