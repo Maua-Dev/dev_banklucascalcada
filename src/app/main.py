@@ -1,4 +1,3 @@
-from .entities.account import BankAccount
 from .entities.bankNotesParser import NotesToMoney
 from .repo.bank_repository_mock import IBankMock 
 from fastapi import FastAPI, HTTPException
@@ -11,7 +10,9 @@ app = FastAPI()
 
 @app.get("/")
 def Root():
-    return repo.get_account("1234","12345-6")
+    acc = repo.get_account("1234","12345-6")
+    if acc is None: return
+    return acc.toDict()
 
 @app.post("/deposit")
 def Deposit(notes:dict):

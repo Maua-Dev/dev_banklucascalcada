@@ -1,37 +1,57 @@
 from typing import Dict, Optional, List
+from fastapi.exceptions import HTTPException
 
-#from ..enums.item_type_enum import ItemTypeEnum
 from ..entities.account import BankAccount
+from ..entities.transaction import Transaction, TransactionType
 from .bank_repository_interface import IBank
-#from .item_repository_interface import IItemRepository
 
 
 class IBankMock(IBank):
     __accounts: Dict[tuple,BankAccount]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__accounts = {}
 
-    def create_account(self,name:str,agency:str,account:str,initialBalance:float):
-        newAccount = BankAccount(name,agency,account)
+    def create_account(self,name:str,agency:str,account:str,initialBalance:float=100.0) -> None:
+        newAccount = BankAccount(name,agency,account,initialBalance)
         self.__accounts[(agency,account)] = newAccount
 
     def get_account(self, agency:str, account:str) -> Optional[BankAccount]:
         return self.__accounts.get((agency,account),None)
 
-    def deposit(self, agency:str, account:str, ammount:float):
+    def deposit(self, agency:str, account:str, ammount:float) -> Optional[dict]:
         acc = self.get_account(agency,account)
-        if acc is None: return
-        return acc.Deposit(ammount)
 
-    def withdraw(self, agency:str, account:str, ammount:float):
-        acc = self.get_account(agency,account)
         if acc is None: return
-        return acc.Withdraw(ammount)
+        if ammount > acc.current_balance * 2:
+            raise HTTPException(status_code=403, detail="Depósito suspeito")
 
-    def get_history(self, agency:str, account:str):
+        acc.current_balance += ammount
+        transactionObj = Transaction(TransactionType.DEPOSIT, ammount, acc.current_balance)
+        acc.addToHistory(transactionObj)
+
+        response = {"current_balance": acc.current_balance, "timestamp": transactionObj.timestamp}
+        return response
+
+    def withdraw(self, agency:str, account:str, ammount:float) -> Optional[dict]:
         acc = self.get_account(agency,account)
+
         if acc is None: return
+        if ammount > acc.current_balance:
+            raise HTTPException(status_code=403, detail="Saldo insuficiente para transação")
+
+        acc.current_balance -= ammount
+        transactionObj = Transaction(TransactionType.WITHDRAW, ammount, acc.current_balance)
+        acc.addToHistory(transactionObj)
+
+        response = {"current_balance": acc.current_balance, "timestamp": transactionObj.timestamp}
+        return response
+
+    def get_history(self, agency:str, account:str) -> Optional[dict]:
+        acc = self.get_account(agency,account)
+
+        if acc is None: return
+
         return acc.history
 
 #class ItemRepositoryMock(IItemRepository):

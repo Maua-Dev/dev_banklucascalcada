@@ -11,7 +11,7 @@ class Transaction:
         self.__type = transactionType
         self.__value = value
         self.__currentBalance = currentBalance
-        self.__timestamp = time()
+        self.__timestamp = time() * 1000
 
     def toDict(self) -> dict:
         return {
